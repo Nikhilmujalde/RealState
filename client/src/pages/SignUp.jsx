@@ -54,7 +54,7 @@ const SignUp = () => {
       <div className='gap-2 flex m-2'>
         <p>Already have an account</p>
         <Link to={'/sign-in'}>
-          <span className='text-blue-400'>{loading ? 'loading' : 'SignUp'}</span>
+          <span className='text-blue-400'>{loading ? 'loading' : 'SignIn'}</span>
         </Link>
       </div>
       {error && <p className='text-red-500 mt-5'>{error}</p> }
