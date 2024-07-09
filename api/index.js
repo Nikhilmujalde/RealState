@@ -5,10 +5,12 @@ import userRouter from "./routes/user.router.js"
 import authRouter from "./routes/auth.router.js"
 import cors from 'cors'
 import 'dotenv/config'
+import cookieParser from "cookie-parser"
 const app = express()
 const port = 3000
 app.use(cors())
 app.use(express.json())
+app.use(cookieParser())
 // console.log(process.env.MONGO)
 mongoose.connect(process.env.MONGO)
 .then(()=>{
