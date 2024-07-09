@@ -1,14 +1,20 @@
 import React, { useState } from 'react'
-import { Link,useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { signInFailure, signInStart, signInSucces } from '../redux/user/userSlice'
+import Oauth from '../components/Oauth'
 const Signin = () => {
   const [formData, setformData] = useState({
     username: '',
     email: '',
     password: ''
   })
-  const [error, seterror] = useState(null)
-  const [loading, setloading] = useState(false)
+  // using loading and error globally with the  help of redux
+  const { loading, error } = useSelector((state) => state.user)
+  // const [error, seterror] = useState(null)
+  // const [loading, setloading] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const handleChange = (e) => {
     // setformData({})
     setformData({
@@ -20,7 +26,8 @@ const Signin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setloading(true)
+      // setloading(true)
+      dispatch(signInStart)
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,17 +35,20 @@ const Signin = () => {
       })
       const data = await res.json()
       if (data.success === false) {
-        seterror(data.message)
-        setloading(false)
+        // seterror(data.message)
+        // setloading(false)
+        dispatch(signInFailure(data.message))
         return
       }
-      setloading(false)
-      seterror(null)
+      // setloading(false)
+      // seterror(null)
+      dispatch(signInSucces)
       navigate('/')
       console.log(data)
     } catch (error) {
-      setloading(false)
-      seterror(error.message)
+      // setloading(false)
+      // seterror(error.message)
+      dispatch(signInFailure(error.message))
     }
 
   }
@@ -46,10 +56,11 @@ const Signin = () => {
     <div className='max-w-lg p-3 mx-auto'>
       <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
       <form onSubmit={handleSubmit} action="" className='flex flex-col gap-4'>
-        
+
         <input type="email" placeholder='email' className='border p-3 rounded-lg' id='email' onChange={handleChange} />
         <input type="password" placeholder='password' className='border p-3 rounded-lg' id='password' onChange={handleChange} />
         <button disabled={loading} className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>Sign In</button>
+        <Oauth/>
       </form>
       <div className='gap-2 flex m-2'>
         <p>Dont have an account</p>
@@ -57,7 +68,7 @@ const Signin = () => {
           <span className='text-blue-400'>{loading ? 'loading' : 'SignUp'}</span>
         </Link>
       </div>
-      {error && <p className='text-red-500 mt-5'>{error}</p> }
+      {error && <p className='text-red-500 mt-5'>{error}</p>}
     </div>
   )
 }

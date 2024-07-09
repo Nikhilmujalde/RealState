@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Link,useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import Oauth from '../components/Oauth'
 const SignUp = () => {
   const [formData, setformData] = useState({
     username: '',
@@ -50,6 +51,7 @@ const SignUp = () => {
         <input type="email" placeholder='email' className='border p-3 rounded-lg' id='email' onChange={handleChange} />
         <input type="password" placeholder='password' className='border p-3 rounded-lg' id='password' onChange={handleChange} />
         <button disabled={loading} className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>Sign Up</button>
+        <Oauth/>
       </form>
       <div className='gap-2 flex m-2'>
         <p>Already have an account</p>
@@ -57,7 +59,7 @@ const SignUp = () => {
           <span className='text-blue-400'>{loading ? 'loading' : 'SignIn'}</span>
         </Link>
       </div>
-      {error && <p className='text-red-500 mt-5'>{error}</p> }
+      {error && <p className='text-red-500 mt-5'>{error}</p>}
     </div>
   )
 }

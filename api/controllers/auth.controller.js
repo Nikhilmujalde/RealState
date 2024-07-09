@@ -34,3 +34,37 @@ export const signin = async (req,res,next)=>{
         next(error)
     }
 }
+
+
+export const google = async(req,res,next)=>{
+    try {
+        // check if the user exist or not if it doesn't then create the user
+
+        const user = await User.findOne({email:req.body.email})
+        // if the user  exist we need to register the user so create a token and save it inside a cookie
+        if(user){
+            // console.log("WE are here")
+            if (!user.avatar || user.avatar === "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png") {
+                user.avatar = req.body.photo;
+                await user.save(); // Save the updated user object
+              }
+            const token = jwt.sign({id:user._id},process.env.JWT_SECRET)
+            // console.log(req.body.photo)
+            const {password:pass,...rest} = user._doc
+            res.cookie('access_token',token,{httpOnly:true}).status(200).json(rest)
+        }
+        else{
+            // now for signing with google we don't need password so we will generate a random
+            const generatePassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
+            const hashedPassword = bcrypt.hashSync(generatePassword,10)
+            const newUser = new User({username:req.body.name.split(" ").join("").toLowercase()+Math.random().toString(36).slice(-4),email:req.body.email,password:hashedPassword,avatar:req.body.photo})
+            console.log(req.body.photo)
+            await newUser.save()
+            const token = jwt.sign({id:user._id},process.env.JWT_SECRET)
+            const {password:pass,...rest} = newUser._doc
+            res.cookie('access_token',token,{httpOnly:true}).status(200).json(rest)
+        }
+    } catch (error) {
+        next(error)
+    }
+}
