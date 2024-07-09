@@ -1,76 +1,125 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useRef } from 'react'
-import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage'
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 import { app } from '../firebase'
+import { updateUserFailure, updateUserSuccess, updateUserStart, deleteUserFailure, deleteUserStart, deleteUserSuccess } from '../redux/user/userSlice'
+import { useDispatch } from 'react-redux'
 const Profile = () => {
-  const {currentUser} = useSelector((state=>state.user))
-  const fileRef = useRef(null)
-  const [file, setfile] = useState(undefined)
-  const [filePer, setfilePer] = useState(0)
-  const [fileError, setfileError] = useState(false)
-  const [formData, setformData] = useState({})
-  // console.log(filePer)
-  // console.log(file)
-  // console.log(formData)
-  // console.log(fileError)
-  const handleFileUpload=(file)=>{
-    const storage = getStorage(app)
-    // we will create a unique file name so that when the user changes it profile it does not give an error
-    const fileName = new Date().getTime()+file.name
-    const storageRef = ref(storage,fileName);
-    const uploadTask = uploadBytesResumable(storageRef,file)
-    uploadTask.on('state_changed',
-      (snapshot)=>{
-        const progress = (snapshot.bytesTransferred/snapshot.totalBytes)*100
-        // console.log('Upload is ' + progress + "%done");
-        setfilePer(Math.round(progress))
-      },
-      (error)=>{
-        setfileError(true)
-      },
-      ()=>{
-        getDownloadURL(uploadTask.snapshot.ref).then(
-          (downloadUrl)=>{
-            setformData({...formData,avatar:downloadUrl})
-          }
-        )
-      },
-    );
-  }
-  useEffect(() => {
-    if(file){
-      handleFileUpload(file)
-      
-    }
-  }, [file])
-  
-  return (
-    <div className='p-3 max-w-lg mx-auto'>
-      <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
-      <form className='flex flex-col ' action="">
-        <input onChange={(e)=>setfile(e.target.files[0])} type="file" ref={fileRef} hidden accept='image/*'/>
-          <img onClick={()=>fileRef.current.click()} className='rounded-full w-24 self-center mt-2 h-24 object-cover cursor-pointer' src={ formData.avatar || currentUser.avatar} alt="profile" />
-        <p className='text-sm self-center'>
-          {fileError ?
-          (<span className='text-red-700'>Error Image Upload (Image should be less than 2 mb)</span>):
-          filePer > 0 && filePer < 100 ? 
-          <span className='text-slate-700'>{`Uploading ${filePer}%`}</span>:
-          filePer === 100 ?
-          <span className='text-green-700'>Image Successfully uploaded</span>:""
-        }
-        </p>
-        <input type="text" placeholder='username' id='username' className='border p-3 rounded-lg my-2' />
-        <input type="email" placeholder='email' id='email' className='border p-3 rounded-lg my-2' />
-        <input type="password" placeholder='password' id='password' className='border p-3 my-2 rounded-lg' />
-        <button className='bg-gray-600 text-white rounded-lg p-3 uppercase hover:opacity-90 disabled:opacity-70'>update </button>
-      </form>
-      <div className='flex justify-between mt-3'>
-        <span className='text-red-700 cursor-pointer'>Delete Account</span>
-        <span className='text-red-700 cursor-pointer'>Sign Out</span>
-      </div>
-    </div>
-  )
+	const { currentUser, loading, error } = useSelector((state) => state.user)
+	const fileRef = useRef(null)
+	const [file, setfile] = useState(undefined)
+	const [filePer, setfilePer] = useState(0)
+	const [fileError, setfileError] = useState(false)
+	const [formData, setformData] = useState({})
+	const [updateSucces, setupdateSucces] = useState(false)
+	const dispatch = useDispatch()
+	// console.log(filePer)
+	// console.log(file)
+	console.log(formData)
+	// console.log(fileError)
+	useEffect(() => {
+		if (file) {
+			handleFileUpload(file)
+		}
+	}, [file])
+	const handleFileUpload = (file) => {
+		const storage = getStorage(app)
+		// we will create a unique file name so that when the user changes it profile it does no  t give an error
+		const fileName = new Date().getTime() + file.name
+		const storageRef = ref(storage, fileName);
+		const uploadTask = uploadBytesResumable(storageRef, file)
+		uploadTask.on('state_changed',
+			(snapshot) => {
+				const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+				// console.log('Upload is ' + progress + "%done");
+				setfilePer(Math.round(progress))
+			},
+			(error) => {
+				setfileError(true)
+			},
+			() => {
+				getDownloadURL(uploadTask.snapshot.ref).then(
+					(downloadUrl) => {
+						setformData({ ...formData, avatar: downloadUrl })
+					}
+				)
+			},
+		);
+	}
+	
+	const handleChange = (e) => {
+		setformData({ ...formData, [e.target.id]: e.target.value })
+	}
+	const handleSubmit = async (e) => {
+		e.preventDefault()
+		console.log('Before', loading)
+		try {
+			dispatch(updateUserStart())
+			// console.log()
+			const res = await fetch(`/api/user/update/${currentUser._id}`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(formData)
+			})
+			console.log('After', loading)
+			const data = await res.json()
+			if (data.success === false) {
+				dispatch(updateUserFailure(data.message))
+				return;
+				// return
+			}
+				dispatch(updateUserSuccess(data))
+				setupdateSucces(true)
+		} catch (error) {
+			dispatch(updateUserFailure(error.message))
+		}
+	}
+
+	const handleDelete=async()=>{
+		try {
+			dispatch(deleteUserStart())
+			const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+				method: 'DELETE',
+			})
+			const data = await res.json()
+			if(data.success === false){
+				dispatch(deleteUserFailure(data.message))
+				return;
+			}
+			dispatch(deleteUserSuccess(data))
+		} catch (error) {
+			dispatch(deleteUserFailure(error.message))
+		}
+	}
+	return (
+		<div className='p-3 max-w-lg mx-auto'>
+			<h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
+			<form onSubmit={handleSubmit} className='flex flex-col ' action="">
+				<input onChange={(e) => setfile(e.target.files[0])} type="file" ref={fileRef} hidden accept='image/*' />
+				<img onClick={() => fileRef.current.click()} className='rounded-full w-24 self-center mt-2 h-24 object-cover cursor-pointer' src={formData.avatar || currentUser.avatar} alt="profile" />
+				<p className='text-sm self-center'>
+					{fileError ?
+						(<span className='text-red-700'>Error Image Upload (Image should be less than 2 mb)</span>) :
+						filePer > 0 && filePer < 100 ?
+							<span className='text-slate-700'>{`Uploading ${filePer}%`}</span> :
+							filePer === 100 ?
+								<span className='text-green-700'>Image Successfully uploaded</span> : ""
+					}
+				</p>
+				<input onChange={handleChange} type="text" placeholder='username' defaultValue={currentUser.username} id='username' className='border p-3 rounded-lg my-2' />
+				<input onChange={handleChange} type="email" placeholder='email' defaultValue={currentUser.email} id='email' className='border p-3 rounded-lg my-2' />
+				<input onChange={handleChange} type="password" placeholder='password' id='password' className='border p-3 my-2 rounded-lg' />
+				<button className='bg-gray-600 text-white rounded-lg p-3 uppercase hover:opacity-90 disabled:opacity-70'>{loading ? 'loading..' : 'Update'} </button>
+			</form>
+			<div className='flex justify-between mt-3'>
+				<span onClick={handleDelete} className='text-red-700 cursor-pointer'>Delete Account</span>
+				<span className='text-red-700 cursor-pointer'>Sign Out</span>
+			</div>
+			<p className='text-red-700 mt-5'>{error?error:""}</p>
+			<p className='text-green-700 mt-5'>{updateSucces?'User is updated successfully':""}</p>
+		</div>
+	)
 }
 
 export default Profile
