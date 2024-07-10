@@ -2,8 +2,8 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { app } from '../firebase'
-import {useSelector} from 'react-redux'
-import { useNavigate ,useParams} from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 const UpdateListing = () => {
     const navigate = useNavigate()
     const [files, setfiles] = useState({})
@@ -22,7 +22,7 @@ const UpdateListing = () => {
         furnished: false,
     })
     const params = useParams()
-    const {currentUser} = useSelector(state => state.user)
+    const { currentUser } = useSelector(state => state.user)
     const [imageUploadError, setimageUploadError] = useState(false)
     const [uploading, setuploading] = useState(false)
     const [loading, setloading] = useState(false)
@@ -30,7 +30,7 @@ const UpdateListing = () => {
     // console.log(files)
     // console.log(formData)
     useEffect(() => {
-        const fetchListing = async()=>{
+        const fetchListing = async () => {
             const listingId = params.listingId
             // console.log(ListingId)
             try {
@@ -49,7 +49,7 @@ const UpdateListing = () => {
 
         fetchListing()
     }, [])
-    
+
     const handleImageSubmit = async (e) => {
         if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
             setuploading(true)
@@ -109,27 +109,27 @@ const UpdateListing = () => {
         })
     }
 
-    const handleChange = (e)=>{
+    const handleChange = (e) => {
         // doing this so we can only choose one rent or sale
-        if(e.target.id === 'sale' || e.target.id === 'rent'){
+        if (e.target.id === 'sale' || e.target.id === 'rent') {
             setformData({
                 ...formData,
                 type: e.target.id
             })
         }
         // now setting for parking furnished and offer
-        if(e.target.id === 'parking' || e.target.id === 'furnished' || e.target.id === 'offer'){
+        if (e.target.id === 'parking' || e.target.id === 'furnished' || e.target.id === 'offer') {
             setformData({
                 ...formData,
-                [e.target.id]:e.target.checked
+                [e.target.id]: e.target.checked
             })
         }
 
         // now for the remaining parts
-        if(e.target.type === 'text' || e.target.type === 'number' || e.target.type === 'textarea'){
+        if (e.target.type === 'text' || e.target.type === 'number' || e.target.type === 'textarea') {
             setformData({
                 ...formData,
-                [e.target.id]:e.target.value
+                [e.target.id]: e.target.value
             })
         }
     }
@@ -141,7 +141,7 @@ const UpdateListing = () => {
             if (+formData.regularPrice < +formData.discountPrice) return seterror('Discount cannot be greater than regular Price')
             setloading(true)
             seterror(false)
-            
+
             const res = await fetch(`/api/listing/edit/${params.listingId}`, {
                 method: 'PUT', // Use the correct HTTP method
                 headers: { 'Content-Type': 'application/json' },
@@ -150,26 +150,26 @@ const UpdateListing = () => {
                     userRef: currentUser._id,
                 })
             })
-            
+
             if (!res.ok) {
                 const errorText = await res.text();
                 throw new Error(`Failed to update listing: ${res.status} - ${errorText}`);
             }
-            
+
             const data = await res.json()
             setloading(false)
-            
+
             if (data.success === false) {
                 seterror(data.message)
             }
-            
+
             navigate(`/listing/${data._id}`)
         } catch (error) {
             seterror(error.message)
             setloading(false)
         }
     }
-    
+
     return (
         <div className='p-3 max-w-4xl mx-auto'>
             <h1 className='font-semibold text-center text-3xl my-7'>Update  Listing</h1>
@@ -213,17 +213,21 @@ const UpdateListing = () => {
                             <input type="number" id='regularPrice' min={1000} max={100000} required onChange={handleChange} value={formData.regularPrice} className='p-3 border border-gray-400 rounded-lg' />
                             <div className="flex flex-col items-center">
                                 <span>Regular Price</span>
-                                <span className='text-xs'>(Rs / month)</span>
+                                {formData.type === 'rent' && (
+                                    <span className='text-xs'>(Rs / month)</span>
+                                )}
                             </div>
                         </div>
-                        {formData.offer && 
-                        <div className="flex items-center gap-2">
-                            <input type="number" id='discountPrice' min={1000} max={100000} onChange={handleChange} value={formData.discountPrice} required className='p-3 border border-gray-400 rounded-lg' />
-                            <div className="flex flex-col items-center">
-                                <span>Discounted Price</span>
-                                <span className='text-xs'>(Rs / month)</span>
+                        {formData.offer &&
+                            <div className="flex items-center gap-2">
+                                <input type="number" id='discountPrice' min={1000} max={100000} onChange={handleChange} value={formData.discountPrice} required className='p-3 border border-gray-400 rounded-lg' />
+                                <div className="flex flex-col items-center">
+                                    <span>Discounted Price</span>
+                                    {formData.type === 'rent' && (
+                                        <span className='text-xs'>(Rs / month)</span>
+                                    )}
+                                </div>
                             </div>
-                        </div>
                         }
                     </div>
                 </div>
@@ -245,10 +249,10 @@ const UpdateListing = () => {
 
                         ))
                     }
-                    <button disabled={loading || uploading} className='p-3 mt-4 bg-slate-700 text-white rounded-lg uppercase hover:opacity-90 disabled:opacity-80'>{loading? 'Updating...': 'Update Listing'}</button>
+                    <button disabled={loading || uploading} className='p-3 mt-4 bg-slate-700 text-white rounded-lg uppercase hover:opacity-90 disabled:opacity-80'>{loading ? 'Updating...' : 'Update Listing'}</button>
                     {error && <p className='text-red-700 text-sm'>{error}</p>}
                 </div>
-                    
+
             </form>
         </div>
     )
