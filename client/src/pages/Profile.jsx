@@ -19,7 +19,7 @@ const Profile = () => {
 	const dispatch = useDispatch()
 	// console.log(filePer)
 	// console.log(file)
-	console.log(formData)
+	// console.log(formData)
 	// console.log(fileError)
 	useEffect(() => {
 		if (file) {
