@@ -14,6 +14,8 @@ const Profile = () => {
 	const [fileError, setfileError] = useState(false)
 	const [formData, setformData] = useState({})
 	const [updateSucces, setupdateSucces] = useState(false)
+	const [showListingError, setshowListingError] = useState(false)
+	const [userListing, setuserListing] = useState([])
 	const dispatch = useDispatch()
 	// console.log(filePer)
 	// console.log(file)
@@ -107,6 +109,21 @@ const Profile = () => {
 			dispatch(signOutUserFailure(error))
 		}
 	}
+	const handleShowListing=async()=>{
+		try {
+			setshowListingError(false)
+			const res = await fetch(`/api/user/listings/${currentUser._id}`)
+			console.log('we are here')
+			const data = await res.json()
+			console.log(data)
+			if(data.success === false){
+				setshowListingError(true)
+			}
+			setuserListing(data)
+		} catch (error) {
+			showListingError(true)
+		}
+	}
 	return (
 		<div className='p-3 max-w-lg mx-auto'>
 			<h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
@@ -136,6 +153,27 @@ const Profile = () => {
 			</div>
 			<p className='text-red-700 mt-5'>{error?error:""}</p>
 			<p className='text-green-700 mt-5'>{updateSucces?'User is updated successfully':""}</p>
+			<button onClick={handleShowListing} className='text-green-700 w-full'>Show Listings</button>
+			<p>{showListingError?'Error showing listing':""}</p>
+			{userListing && userListing.length > 0 &&
+			<div className="flex flex-col gap-4">
+				<h1 className='text-center mt-7 text-2xl font-semibold'>Your listings</h1>
+			{userListing.map((listing) =>
+				<div className='border rounded-lg p-3 flex gap-4 justify-between items-center' key={listing._id}>
+					<Link to={`/listing/${listing._id}`}>
+						<img src={listing.imageUrls[0]} alt="listing image"  className='h-16 w-16 object-contain '/>
+					</Link>
+					<Link className='flex-1 font-semibold hover:underline truncate' to={`/listing/${listing._id}`}>
+						<p className=' '>{listing.name}</p>
+					</Link>
+					<div className="flex flex-col items-center">
+						<button className='text-red-700 uppercase'>Delete</button>
+						<button className='text-green-700 uppercase'>edit</button>
+					</div>
+				</div>)}
+			</div>
+			
+			}
 		</div>
 	)
 }
