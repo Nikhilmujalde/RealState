@@ -15,6 +15,7 @@ const Search = () => {
     })
     const [loading, setloading] = useState(false)
     const [listings, setlistings] = useState([])
+    const [showMore, setshowMore] = useState(false)
     console.log(listings)
     useEffect(() => {
 
@@ -47,6 +48,11 @@ const Search = () => {
             const searchQuery = urlParams.toString()
             const res = await fetch(`/api/listing/get?${searchQuery}`)
             const data = await res.json()
+            if(data.length > 8){
+                setshowMore(true)
+            }
+
+
             setlistings(data)
             setloading(false)
         }
@@ -81,19 +87,48 @@ const Search = () => {
     }
 
     const handleSubmit = (e) => {
-        e.preventDefault()
-        const urlParams = new URLSearchParams()
-        urlParams.set('searchTerm', setsidebardata.searchTerm)
-        urlParams.set('type', setsidebardata.type)
-        urlParams.set('parking', setsidebardata.parking)
-        urlParams.set('furnished', setsidebardata.furnished)
-        urlParams.set('offer', setsidebardata.offer)
-        urlParams.set('sort', setsidebardata.sort)
-        urlParams.set('order', setsidebardata.order)
+        // we are changing the part of the url only when they are changed otherwise we will not change them if we dont do these than when next time we submit the form it will search based on the previous filters
+        e.preventDefault();
+        const urlParams = new URLSearchParams();
+    
+        if (setsidebardata.searchTerm) {
+            urlParams.set('searchTerm', setsidebardata.searchTerm);
+        }
+        if (setsidebardata.type !== 'all') {
+            urlParams.set('type', setsidebardata.type);
+        }
+        if (setsidebardata.parking) {
+            urlParams.set('parking', setsidebardata.parking);
+        }
+        if (setsidebardata.furnished) {
+            urlParams.set('furnished', setsidebardata.furnished);
+        }
+        if (setsidebardata.offer) {
+            urlParams.set('offer', setsidebardata.offer);
+        }
+        if (setsidebardata.sort !== 'created_at' || setsidebardata.order !== 'desc') {
+            urlParams.set('sort', setsidebardata.sort);
+            urlParams.set('order', setsidebardata.order);
+        }
+    
+        const searchQuery = urlParams.toString();
+        navigate(`/search?${searchQuery}`);
+    };
+    
+    const onShowMoreClick=async()=>{
+        // we will fetch the data after teh listings that we are already seeing
+        const numberOfListings = listings.length
+        const startIndex = numberOfListings
+        const urlParams = new URLSearchParams(location.search)
+        urlParams.set('startIndex',startIndex)
         const searchQuery = urlParams.toString()
-        console.log(urlParams)
-        navigate(`/search?${searchQuery}`)
+        const res = await fetch(`/api/listing/get?${searchQuery}`)
+        const data = await res.json()
+        if(data.length < 9){
+            setshowMore(false)
 
+        }
+        setlistings([...listings,...data])  
     }
     return (
         <div className='flex flex-col md:flex-row'>
@@ -163,6 +198,11 @@ const Search = () => {
                     {!loading && listings && listings.map((listing) => (
                         <Listingitem key={listing._id} listing={listing} />
                     ))}
+                    {showMore &&
+                    (
+                        <button className='text-green-700 hover:underline p-7 text-center w-full' onClick={()=>onShowMoreClick()}>Show More</button>
+                    )
+                    }
                 </div>
             </div>
         </div>
