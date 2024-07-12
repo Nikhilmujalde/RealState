@@ -16,6 +16,7 @@ const Profile = () => {
 	const [updateSucces, setupdateSucces] = useState(false)
 	const [showListingError, setshowListingError] = useState(false)
 	const [userListing, setuserListing] = useState([])
+	const [noListing, setnoListing] = useState(false)
 	const dispatch = useDispatch()
 	// console.log(filePer)
 	// console.log(file)
@@ -111,15 +112,18 @@ const Profile = () => {
 	}
 	const handleShowListing=async()=>{
 		try {
+			setnoListing(false)
 			setshowListingError(false)
 			const res = await fetch(`/api/user/listings/${currentUser._id}`)
-			console.log('we are here')
+			// console.log('we are here')
 			const data = await res.json()
 			console.log(data)
 			if(data.success === false){
 				setshowListingError(true)
 			}
 			setuserListing(data)
+			if(userListing.length === 0) setnoListing(true)
+				else setnoListing(false)
 		} catch (error) {
 			showListingError(true)
 		}
@@ -171,6 +175,12 @@ const Profile = () => {
 			<p className='text-green-700 mt-5'>{updateSucces?'User is updated successfully':""}</p>
 			<button onClick={handleShowListing} className='text-green-700 w-full'>Show Listings</button>
 			<p>{showListingError?'Error showing listing':""}</p>
+			<div>
+				{
+					noListing && userListing.length === 0 && 
+					<p>No listing to show</p>
+				}
+			</div>
 			{userListing && userListing.length > 0 &&
 			<div className="flex flex-col gap-4">
 				<h1 className='text-center mt-7 text-2xl font-semibold'>Your listings</h1>

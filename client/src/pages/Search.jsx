@@ -16,7 +16,7 @@ const Search = () => {
     const [loading, setloading] = useState(false)
     const [listings, setlistings] = useState([])
     const [showMore, setshowMore] = useState(false)
-    console.log(listings)
+    // console.log(listings)
     useEffect(() => {
 
         // we are doing this so that when se change on search bar we the changes in the left side of the div
@@ -45,18 +45,22 @@ const Search = () => {
 
         const fetchListings = async () => {
             setloading(true)
+            setshowMore(false)
             const searchQuery = urlParams.toString()
             const res = await fetch(`/api/listing/get?${searchQuery}`)
             const data = await res.json()
             if(data.length > 8){
                 setshowMore(true)
             }
+            else{
+                setshowMore(false)
+            }
 
 
             setlistings(data)
             setloading(false)
         }
-        setloading(false)
+        // setloading(false)
         fetchListings()
     }, [location.search])
 
@@ -110,7 +114,7 @@ const Search = () => {
             urlParams.set('sort', setsidebardata.sort);
             urlParams.set('order', setsidebardata.order);
         }
-    
+      
         const searchQuery = urlParams.toString();
         navigate(`/search?${searchQuery}`);
     };
@@ -160,7 +164,7 @@ const Search = () => {
                         </div>
                     </div>
                     <div className="flex gap-2 flex-wrap items-center">
-                        <label className='font-semibold'>Ameneties:</label>
+                        <label className='font-semibold'>Amenities:</label>
                         <div className="flex gap-2">
                             <input onChange={handleChange} checked={setsidebardata.parking} type="checkbox" id='parking' className='w-5' />
                             <span>Parking</span>
@@ -176,10 +180,10 @@ const Search = () => {
                             Sort
                         </label>
                         <select onChange={handleChange} defaultValue={`created_at_desc`} name="" id="sort_order" className='border rounded-lg p-3'>
-                            <option value="regularPrice_desc">Price high to low</option>
-                            <option value="regularPrice_asc">Price low to high</option>
                             <option value="createdAt_desc">Latest</option>
                             <option value="createdAt_asc">Oldest</option>
+                            <option value="regularPrice_desc">Price high to low</option>
+                            <option value="regularPrice_asc">Price low to high</option>
                         </select>
 
                     </div>

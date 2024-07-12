@@ -30,8 +30,8 @@ const Header = () => {
             <div className="flex justify-between items-center mx-auto max-w-6xl p-3">
                 <Link to={'/'}>
                 <h1 className='font-bold text-sm sm:text-xl flex flex-wrap'>
-                    <span className='text-gray-500'>Real</span>
-                    <span className='text-gray-900'>State</span>
+                    <span className='text-gray-500'>Mirai</span>
+                    <span className='text-gray-900'>Dwell</span>
                 </h1>
                 </Link>
                 <form onSubmit={handleSubmit} action="" className='bg-gray-100 p-3 justify-between rounded-xl flex items-center w-24 sm:w-64'>
@@ -42,7 +42,7 @@ const Header = () => {
                     </button>
                 </form>
                 <ul className='flex gap-4'>
-                    <Link to={'/home'}>
+                    <Link to={'/'}>
                     <li className='hidden sm:inline text-gray-700 hover:underline'>Home</li>
                     </Link>
                     <Link to={'/about'}>

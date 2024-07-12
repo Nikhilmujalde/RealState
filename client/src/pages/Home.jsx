@@ -49,13 +49,12 @@ const Home = () => {
       {
         <div className="flex flex-col gap-6 p-28 max-w-6xl mx-auto">
           <h1 className='text-slate-700 font-bold text-3xl lg:text-6xl'>
-            Find your next <span className='text-slate-500'>perfect</span> <br /> place with ease
+          Simplify your <span className='text-slate-500'>search</span> <br /> for the perfect home.
           </h1>
           <div className="text-gray-400 text-xs sm:text-sm">
-            Real State is the best place to find your next place to live <br />
-            We have a wide range of properties to search from
+          "MiraiDwell is your go-to destination for finding your next home. With a diverse array of <br /> properties to choose from, ranging from cozy apartments to spacious houses, we cater <br /> to all your housing needs. Start your search with MiraiDwell and discover the perfect place to live."
           </div>
-          <Link className='text-xs sm:text-sm text-blue-800' to={'/search'}>Lets get started</Link>
+          <Link className='text-xs sm:text-sm hover:underline text-blue-800' to={'/search'}>Lets get started</Link>
         </div>
       }
       {

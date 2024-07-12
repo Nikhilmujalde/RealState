@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 const UpdateListing = () => {
     const navigate = useNavigate()
-    const [files, setfiles] = useState({})
+    const [files, setfiles] = useState([])
     const [formData, setformData] = useState({
         imageUrls: [],
         name: '',
@@ -15,14 +15,14 @@ const UpdateListing = () => {
         type: 'rent',
         bedrooms: 1,
         bathrooms: 1,
-        regularPrice: 4000,
+        regularPrice: 1000,
         discountPrice: 0,
         offer: false,
         parking: false,
         furnished: false,
     })
     const params = useParams()
-    const { currentUser } = useSelector(state => state.user)
+    const { currentUser } = useSelector((state) => state.user)
     const [imageUploadError, setimageUploadError] = useState(false)
     const [uploading, setuploading] = useState(false)
     const [loading, setloading] = useState(false)
@@ -143,7 +143,7 @@ const UpdateListing = () => {
             seterror(false)
 
             const res = await fetch(`/api/listing/edit/${params.listingId}`, {
-                method: 'PUT', // Use the correct HTTP method
+                method: 'PUT', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
@@ -181,7 +181,7 @@ const UpdateListing = () => {
                     <div className="flex gap-6 flex-wrap">
                         <div className="flex gap-2">
                             <input type="checkbox" id='sale' onChange={handleChange} checked={formData.type === 'sale'} className='w-5' />
-                            <span>Sell</span>
+                            <span>Sale</span>
                         </div>
                         <div className="flex gap-2">
                             <input type="checkbox" id='rent' onChange={handleChange} checked={formData.type === 'rent'} className='w-5' />
@@ -202,15 +202,15 @@ const UpdateListing = () => {
                     </div>
                     <div className="flex flex-wrap gap-6">
                         <div className="flex items-center gap-2">
-                            <input type="number" id='bedrooms' min={1} onChange={handleChange} value={formData.bedrooms} max={10} required className='p-3 border border-gray-400 rounded-lg' />
+                            <input type="number" id='bedrooms' min={1} onChange={handleChange} value={formData.bedrooms} max={100} required className='p-3 border border-gray-400 rounded-lg' />
                             <span>Beds</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <input type="number" id='bathrooms' min={1} max={10} onChange={handleChange} value={formData.bathrooms} required className='p-3 border border-gray-400 rounded-lg' />
+                            <input type="number" id='bathrooms' min={1} max={100} onChange={handleChange} value={formData.bathrooms} required className='p-3 border border-gray-400 rounded-lg' />
                             <span>Bathrooms</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <input type="number" id='regularPrice' min={1000} max={100000} required onChange={handleChange} value={formData.regularPrice} className='p-3 border border-gray-400 rounded-lg' />
+                            <input type="number" id='regularPrice' min={1000} max={100000000} required onChange={handleChange} value={formData.regularPrice} className='p-3 border border-gray-400 rounded-lg' />
                             <div className="flex flex-col items-center">
                                 <span>Regular Price</span>
                                 {formData.type === 'rent' && (
@@ -220,7 +220,7 @@ const UpdateListing = () => {
                         </div>
                         {formData.offer &&
                             <div className="flex items-center gap-2">
-                                <input type="number" id='discountPrice' min={1000} max={100000} onChange={handleChange} value={formData.discountPrice} required className='p-3 border border-gray-400 rounded-lg' />
+                                <input type="number" id='discountPrice' min={0} max={100000000} onChange={handleChange} value={formData.discountPrice} required className='p-3 border border-gray-400 rounded-lg' />
                                 <div className="flex flex-col items-center">
                                     <span>Discounted Price</span>
                                     {formData.type === 'rent' && (

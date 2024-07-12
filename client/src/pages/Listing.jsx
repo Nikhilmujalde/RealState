@@ -16,7 +16,7 @@ import {
 } from 'react-icons/fa';
 import Contact from './Contact.jsx';
 
-// https://sabe.io/blog/javascript-format-numbers-commas#:~:text=The%20best%20way%20to%20format,format%20the%20number%20with%20commas.
+
 
 export default function Listing() {
     const {currentUser} = useSelector((state)=>state.user)
@@ -48,7 +48,7 @@ export default function Listing() {
     };
     fetchListing();
   }, [params.listingId]);
-  console.log(loading);
+  // console.log(loading);
 
   return (
     <main>
@@ -90,25 +90,31 @@ export default function Listing() {
           )}
           <div className='flex flex-col max-w-4xl mx-auto p-3 my-7 gap-4'>
             <p className='text-2xl font-semibold'>
-              {listing.name} - ${' '}
-              {listing.offer
-                ? listing.discountPrice.toLocaleString('en-IN')
-                : listing.regularPrice.toLocaleString('en-IN')}
+              {listing.name} - Rs{' '}
+              {(+listing.regularPrice - +listing.discountPrice).toLocaleString('en-IN')}
               {listing.type === 'rent' && ' / month'}
             </p>
             <p className='flex items-center mt-6 gap-2 text-slate-600  text-sm'>
               <FaMapMarkerAlt className='text-green-700' />
               {listing.address}
             </p>
-            <div className='flex gap-4'>
-              <p className='bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
+            <div className='flex gap-4 '>
+              <div className='bg-red-900 w-full max-w-[200px] text-white flex items-center justify-center text-center p-1 rounded-md'>
                 {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
-              </p>
-              {listing.offer && (
-                <p className='bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
-                  ${+listing.regularPrice - +listing.discountPrice} OFF
-                </p>
-              )}
+              </div>
+              <div className='bg-green-900 flex items-center justify-center w-full max-w-[200px] text-white text-center p-1 rounded-md'>
+                 Regular Price Rs {listing.regularPrice.toLocaleString('en-IN') } 
+                 {listing.type === 'rent' && ' / month'}
+                </div>
+              <div className='bg-green-900 flex items-center justify-center w-full max-w-[200px] text-white text-center p-1 rounded-md'>
+                 Discount Rs {listing.discountPrice.toLocaleString('en-IN') }
+                 {listing.type === 'rent' && ' / month'} 
+                </div>
+                <div className='bg-green-900 flex items-center justify-center w-full max-w-[200px] text-white text-center p-1 rounded-md'> Final Price
+                  Rs {(+listing.regularPrice - +listing.discountPrice).toLocaleString('en-IN')} 
+                  {listing.type === 'rent' && ' / month'}
+                </div>
+              
             </div>
             <p className='text-slate-800'>
               <span className='font-semibold text-black'>Description - </span>

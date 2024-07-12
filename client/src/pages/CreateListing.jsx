@@ -27,7 +27,7 @@ const CreateListing = () => {
     const [loading, setloading] = useState(false)
     const [error, seterror] = useState(false)
     // console.log(files)
-    console.log(formData)
+    // console.log(formData)
     const handleImageSubmit = async (e) => {
         if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
             setuploading(true)
@@ -150,7 +150,7 @@ const CreateListing = () => {
                     <div className="flex gap-6 flex-wrap">
                         <div className="flex gap-2">
                             <input type="checkbox" id='sale' onChange={handleChange} checked={formData.type === 'sale'} className='w-5' />
-                            <span>Sell</span>
+                            <span>Sale</span>
                         </div>
                         <div className="flex gap-2">
                             <input type="checkbox" id='rent' onChange={handleChange} checked={formData.type === 'rent'} className='w-5' />
@@ -179,18 +179,18 @@ const CreateListing = () => {
                             <span>Bathrooms</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <input type="number" id='regularPrice' min={1000} max={100000} required onChange={handleChange} value={formData.regularPrice} className='p-3 border border-gray-400 rounded-lg' />
+                            <input type="number" id='regularPrice' min={1000} max={100000000} required onChange={handleChange} value={formData.regularPrice} className='p-3 border border-gray-400 rounded-lg' />
                             <div className="flex flex-col items-center">
                                 <span>Regular Price</span>
-                                <span className='text-xs'>(Rs / month)</span>
+                                {/* <span className='text-xs'>(Rs / month)</span> */}
                             </div>
                         </div>
                         {formData.offer && 
                         <div className="flex items-center gap-2">
-                            <input type="number" id='discountPrice' min={1000} max={100000} onChange={handleChange} value={formData.discountPrice} required className='p-3 border border-gray-400 rounded-lg' />
+                            <input type="number" id='discountPrice' min={1000} max={100000000} onChange={handleChange} value={formData.discountPrice} required className='p-3 border border-gray-400 rounded-lg' />
                             <div className="flex flex-col items-center">
-                                <span>Discounted Price</span>
-                                <span className='text-xs'>(Rs / month)</span>
+                                <span>Discount</span>
+                                {/* <span className='text-xs'>(Rs / month)</span> */}
                             </div>
                         </div>
                         }

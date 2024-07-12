@@ -7,6 +7,7 @@ import  listingRouter  from "./routes/listing.route.js"
 import cors from 'cors'
 import 'dotenv/config'
 import cookieParser from "cookie-parser"
+import path from 'path'
 const app = express()
 const port = 3000
 app.use(cors())
@@ -20,6 +21,7 @@ mongoose.connect(process.env.MONGO)
 .catch((err)=>{
     console.log(err);
 })
+const __dirname = path.resolve()
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
@@ -31,6 +33,11 @@ app.listen(port, () => {
 app.use("/api/user",userRouter)
 app.use("/api/auth",authRouter)
 app.use("/api/listing",listingRouter)
+
+app.use(express.static(path.join(__dirname,'/client/dist')))
+app.get('*',(req,res)=>{
+  res.sendFile(path.join(__dirname,'client','dist','index.html'))
+})
 
 app.use((err,req,res,next)=>{
     const statusCode = err.statusCode || 500;
